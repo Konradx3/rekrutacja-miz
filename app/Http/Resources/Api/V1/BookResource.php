@@ -21,11 +21,13 @@ class BookResource extends JsonResource
                 'release_date' => $this->release_date,
                 'publishing_house' => $this->publishing_house,
             ]),
-            'is_borrowed' => $this->is_borrowed,
-            'borrowed_by' => $this->is_borrowed ? [
-                'name' => $this->user->name,
-                'email' => $this->user->email,
-            ] : null,
+            $this->mergeWhen(!$request->routeIs('clients.show'), [
+                'is_borrowed' => $this->is_borrowed,
+                'borrowed_by' => $this->is_borrowed ? [
+                    'first_name' => $this->client->first_name,
+                    'last_name' => $this->client->last_name,
+                ] : null,
+            ])
         ];
     }
 }

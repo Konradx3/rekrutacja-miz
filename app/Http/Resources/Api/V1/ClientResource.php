@@ -15,9 +15,16 @@ class ClientResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->when($request->routeIs('clients.show'), $this->id),
+            'id' => $this->when(
+                $request->routeIs('clients.show'),
+                $this->id
+            ),
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'borrowed_books' => $this->when(
+                $request->routeIs('clients.show'),
+                $this->books->isNotEmpty() ? BookResource::collection($this->books) : []
+            )
         ];
     }
 }

@@ -53,7 +53,7 @@ class ClientController extends Controller
     {
         try
         {
-            $client = Client::find($id);
+            $client = Client::with('books')->findOrFail($id);
 
             if (!$client)
             {

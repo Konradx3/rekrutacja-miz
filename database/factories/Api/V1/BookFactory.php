@@ -22,7 +22,7 @@ class BookFactory extends Factory
             'release_date' => $this->faker->date,
             'publishing_house' => $this->faker->company,
             'is_borrowed' => false,
-            'user_id' => null,
+            'client_id' => null,
         ];
     }
 }

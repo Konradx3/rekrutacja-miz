@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('release_date');
             $table->string('publishing_house');
             $table->boolean('is_borrowed')->default(false);
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
             $table->timestamps();
         });
     }

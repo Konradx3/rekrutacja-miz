@@ -18,7 +18,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with('user')->paginate(20);
+        $books = Book::with('client')->paginate(20);
 
         return response()->json([
             'status' => 200,
@@ -74,7 +74,7 @@ class BookController extends Controller
     public function show($id)
     {
         try {
-            $book = Book::with('user')->findOrFail($id);
+            $book = Book::with('client')->findOrFail($id);
 
             return response()->json([
                 'status' => 200,

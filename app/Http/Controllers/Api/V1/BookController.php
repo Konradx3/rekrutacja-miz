@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\BorrowBookRequest;
-use App\Http\Requests\Api\V1\ReturnBookRequest;
 use App\Http\Requests\Api\V1\StoreBookRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Api\V1\Book;
@@ -19,9 +18,11 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with('client')->paginate(20);
+        $search = $request->query('search');
+
+        $books = Book::with('client')->search($search)->paginate(20);
 
         return response()->json([
             'status' => 200,

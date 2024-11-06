@@ -41,4 +41,21 @@ class Book extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function scopeSearch($query, $search)
+    {
+        if ($search)
+        {
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('author', 'like', '%' . $search . '%')
+                    ->orWhereHas('client', function ($query) use ($search) {
+                        $query->where('first_name', 'like', '%' . $search . '%')
+                            ->orWhere('last_name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        return $query;
+    }
 }

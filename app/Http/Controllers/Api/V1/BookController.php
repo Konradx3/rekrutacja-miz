@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\BorrowBookRequest;
+use App\Http\Requests\Api\V1\ReturnBookRequest;
 use App\Http\Requests\Api\V1\StoreBookRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Api\V1\Book;
+use App\Models\Api\V1\Client;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -87,6 +90,91 @@ class BookController extends Controller
                 'status' => 404,
                 'message' => 'Book cannot be found',
             ], 404);
+        }
+    }
+
+    public function borrowBook(BorrowBookRequest $request, $bookId)
+    {
+        try
+        {
+            $book = Book::findOrFail($bookId);
+
+            if ($book->is_borrowed)
+            {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'The book is already borrowed.'
+                ], 400);
+            }
+
+            $client = Client::findOrFail($request->client_id);
+
+            $book->is_borrowed = true;
+            $book->client_id = $client->id;
+            $book->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'The book has been borrowed.',
+                'book' => new BookResource($book),
+            ], 200);
+
+        }
+        catch (ModelNotFoundException $e)
+        {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Book or client not found.'
+            ], 404);
+
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred, please try again later.'
+            ], 500);
+        }
+    }
+
+    public function returnBook($bookId)
+    {
+        try
+        {
+            $book = Book::findOrFail($bookId);
+
+            if (!$book->is_borrowed)
+            {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'The book is not borrowed.'
+                ], 400);
+            }
+
+            $book->is_borrowed = false;
+            $book->client_id = null;
+            $book->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'The book has been returned.',
+            ], 200);
+
+        }
+        catch (ModelNotFoundException $e)
+        {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Book not found.'
+            ], 404);
+
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'status' => 500,
+                'message' => 'An error occurred, please try again later.'
+            ], 500);
         }
     }
 
